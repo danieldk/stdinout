@@ -1,0 +1,14 @@
+[package]
+name = "stdinout"
+version = "0.1.0"
+authors = ["Daniël de Kok <me@danieldk.eu>"]
+description = "Simple wrapper for files or stdin/stdout."
+documentation = "http://rustdoc.danieldk.eu/stdinout/"
+homepage = "https://github.com/danieldk/stdinout"
+repository = "https://github.com/danieldk/stdinout"
+license = "Apache-2.0"
+exclude = [
+  ".gitignore"
+]
+
+[dependencies]

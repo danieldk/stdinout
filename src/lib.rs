@@ -25,7 +25,7 @@
 //! ```
 
 use std::fs::File;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::io;
 use std::io::{BufRead, BufReader, Write};
 
@@ -35,10 +35,11 @@ pub enum Input {
 }
 
 impl Input {
-    pub fn from(filename: Option<&str>) -> Self
+    pub fn from<P>(path: Option<P>) -> Self
+        where P: Into<PathBuf>
     {
-        match filename {
-            Some(n) => Input::File(Path::new(n.into()).to_owned()),
+        match path {
+            Some(path) => Input::File(path.into()),
             None => Input::Stdin(io::stdin()),
         }
     }
@@ -57,10 +58,11 @@ pub enum Output {
 }
 
 impl Output {
-    pub fn from(filename: Option<&str>) -> Self
+    pub fn from<P>(path: Option<P>) -> Self
+        where P: Into<PathBuf>
     {
-        match filename {
-            Some(n) => Output::File(Path::new(n.into()).to_owned()),
+        match path {
+            Some(path) => Output::File(path.into()),
             None => Output::Stdout(io::stdout()),
         }
     }

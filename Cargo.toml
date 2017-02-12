@@ -1,6 +1,6 @@
 [package]
 name = "stdinout"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["Daniël de Kok <me@danieldk.eu>"]
 description = "Simple wrapper for files or stdin/stdout."
 documentation = "http://rustdoc.danieldk.eu/stdinout/"

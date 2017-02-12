@@ -9,19 +9,21 @@
 //! For reading from a file or the standard input:
 //!
 //! ```
-//! let input = or_stdin(args.get(0));
-//! for line in input.unwrap().buf_read().lines() {
-//!     // ...
+//! let input = Input::from(matches.free.get(0));
+//! let reader = or_exit(input.buf_read());
+//!
+//! for line in reader.lines() {
+//!     // Use 'line'
 //! }
 //! ```
 //!
 //! For writing to a file or the standard output:
 //!
 //! ```
-//! let output = or_stdout(args.get(1));
+//! let output = Output::from(args.get(1));
 //!
 //! // Get an object that implements the Write trait.
-//! let write = output.write();
+//! let write = output.write().unwrap();
 //! ```
 
 use std::fs::File;

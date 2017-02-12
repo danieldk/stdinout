@@ -27,7 +27,25 @@
 use std::fs::File;
 use std::path::PathBuf;
 use std::io;
-use std::io::{BufRead, BufReader, Write};
+use std::io::{Read, BufRead, BufReader, Write};
+
+pub struct InputReader<'a>(Box<BufRead + 'a>);
+
+impl<'a> Read for InputReader<'a> {
+    fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
+        self.0.read(buf)
+    }
+}
+
+impl<'a> BufRead for InputReader<'a> {
+    fn fill_buf(&mut self) -> io::Result<&[u8]> {
+        self.0.fill_buf()
+    }
+
+    fn consume(&mut self, amt: usize) {
+        self.0.consume(amt)
+    }
+}
 
 pub enum Input {
     Stdin(io::Stdin),
@@ -44,10 +62,12 @@ impl Input {
         }
     }
 
-    pub fn buf_read<'a>(&'a self) -> io::Result<Box<BufRead + 'a>> {
+    pub fn buf_read(&self) -> io::Result<InputReader> {
         match self {
-            &Input::Stdin(ref stdin) => Result::Ok(Box::new(stdin.lock())),
-            &Input::File(ref path) => Result::Ok(Box::new(BufReader::new(try!(File::open(path))))),
+            &Input::Stdin(ref stdin) => Result::Ok(InputReader(Box::new(stdin.lock()))),
+            &Input::File(ref path) => {
+                File::open(path).map(BufReader::new).map(Box::new).map(|r| InputReader(r))
+            }
         }
     }
 }

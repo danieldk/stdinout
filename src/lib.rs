@@ -8,7 +8,7 @@
 //!
 //! For reading from a file or the standard input:
 //!
-//! ```
+//! ```rust,ignore
 //! let input = Input::from(matches.free.get(0));
 //! let reader = or_exit(input.buf_read());
 //!
@@ -19,7 +19,7 @@
 //!
 //! For writing to a file or the standard output:
 //!
-//! ```
+//! ```rust,ignore
 //! let output = Output::from(args.get(1));
 //!
 //! // Get an object that implements the Write trait.

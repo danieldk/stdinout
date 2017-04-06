@@ -1,9 +1,9 @@
 [package]
 name = "stdinout"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["Daniël de Kok <me@danieldk.eu>"]
 description = "Simple wrapper for files or stdin/stdout."
-documentation = "http://rustdoc.danieldk.eu/stdinout/"
+documentation = "https://docs.rs/stdinout/"
 homepage = "https://github.com/danieldk/stdinout"
 repository = "https://github.com/danieldk/stdinout"
 license = "Apache-2.0"

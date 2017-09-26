@@ -26,10 +26,12 @@
 //! let write = output.write().unwrap();
 //! ```
 
+use std::fmt;
 use std::fs::File;
 use std::path::PathBuf;
 use std::io;
 use std::io::{Read, BufRead, BufReader, Write};
+use std::process;
 
 pub struct InputReader<'a>(Box<BufRead + 'a>);
 
@@ -93,6 +95,59 @@ impl Output {
         match self {
             &Output::Stdout(ref stdout) => Result::Ok(Box::new(stdout.lock())),
             &Output::File(ref path) => Result::Ok(Box::new(try!(File::create(path)))),
+        }
+    }
+}
+
+macro_rules! stderr(
+    ($($arg:tt)*) => { {
+        let r = writeln!(&mut ::std::io::stderr(), $($arg)*);
+        r.expect("failed printing to stderr");
+    } }
+);
+
+/// Types implementing the `OrExit` provide the `or_exit` function that can
+/// be used to exit a program when a computation was not successful.
+///
+/// The goal of this thread is to provide a function similar to `unwrap()`
+/// without a panic.
+pub trait OrExit<R, S>
+where
+    S: AsRef<str>,
+{
+    /// Exit the program with the given message and status code if the
+    /// computation is not successful. Otherwise, unwrap the value and
+    /// return it.
+    fn or_exit(self, message: S, code: i32) -> R;
+}
+
+impl<R, S, E> OrExit<R, S> for Result<R, E>
+where
+    S: AsRef<str>,
+    E: fmt::Display,
+{
+    fn or_exit(self, description: S, code: i32) -> R {
+        match self {
+            Result::Ok(val) => val,
+            Result::Err(err) => {
+                stderr!("{}: {}", description.as_ref(), err);
+                process::exit(code);
+            }
+        }
+    }
+}
+
+impl<R, S> OrExit<R, S> for Option<R>
+where
+    S: AsRef<str>,
+{
+    fn or_exit(self, description: S, code: i32) -> R {
+        match self {
+            Some(val) => val,
+            None => {
+                stderr!("{}", description.as_ref());
+                process::exit(code);
+            }
         }
     }
 }

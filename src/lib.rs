@@ -30,7 +30,7 @@ use std::fmt;
 use std::fs::File;
 use std::path::PathBuf;
 use std::io;
-use std::io::{Read, BufRead, BufReader, Write};
+use std::io::{BufRead, BufReader, Read, Write};
 use std::process;
 
 pub struct InputReader<'a>(Box<BufRead + 'a>);
@@ -58,7 +58,8 @@ pub enum Input {
 
 impl Input {
     pub fn from<P>(path: Option<P>) -> Self
-        where P: Into<PathBuf>
+    where
+        P: Into<PathBuf>,
     {
         match path {
             Some(path) => Input::File(path.into()),
@@ -69,9 +70,10 @@ impl Input {
     pub fn buf_read(&self) -> io::Result<InputReader> {
         match self {
             &Input::Stdin(ref stdin) => Result::Ok(InputReader(Box::new(stdin.lock()))),
-            &Input::File(ref path) => {
-                File::open(path).map(BufReader::new).map(Box::new).map(|r| InputReader(r))
-            }
+            &Input::File(ref path) => File::open(path)
+                .map(BufReader::new)
+                .map(Box::new)
+                .map(|r| InputReader(r)),
         }
     }
 }
@@ -83,7 +85,8 @@ pub enum Output {
 
 impl Output {
     pub fn from<P>(path: Option<P>) -> Self
-        where P: Into<PathBuf>
+    where
+        P: Into<PathBuf>,
     {
         match path {
             Some(path) => Output::File(path.into()),

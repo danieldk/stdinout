@@ -1,7 +1,7 @@
 [package]
 name = "stdinout"
-version = "0.3.1"
-authors = ["Daniël de Kok <me@danieldk.eu>"]
+version = "0.4.0"
+authors = ["Daniël de Kok <me@danieldk.eu>"]
 description = "Simple wrapper for files or stdin/stdout."
 documentation = "https://docs.rs/stdinout/"
 homepage = "https://github.com/danieldk/stdinout"

@@ -28,12 +28,12 @@
 
 use std::fmt;
 use std::fs::File;
-use std::path::PathBuf;
 use std::io;
 use std::io::{BufRead, BufReader, Read, Write};
+use std::path::PathBuf;
 use std::process;
 
-pub struct InputReader<'a>(Box<BufRead + 'a>);
+pub struct InputReader<'a>(Box<dyn BufRead + 'a>);
 
 impl<'a> Read for InputReader<'a> {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
@@ -69,8 +69,8 @@ impl Input {
 
     pub fn buf_read(&self) -> io::Result<InputReader> {
         match self {
-            &Input::Stdin(ref stdin) => Result::Ok(InputReader(Box::new(stdin.lock()))),
-            &Input::File(ref path) => File::open(path)
+            Input::Stdin(ref stdin) => Result::Ok(InputReader(Box::new(stdin.lock()))),
+            Input::File(ref path) => File::open(path)
                 .map(BufReader::new)
                 .map(Box::new)
                 .map(|r| InputReader(r)),
@@ -94,20 +94,13 @@ impl Output {
         }
     }
 
-    pub fn write<'a>(&'a self) -> io::Result<Box<Write + 'a>> {
+    pub fn write<'a>(&'a self) -> io::Result<Box<dyn Write + 'a>> {
         match self {
-            &Output::Stdout(ref stdout) => Result::Ok(Box::new(stdout.lock())),
-            &Output::File(ref path) => Result::Ok(Box::new(try!(File::create(path)))),
+            Output::Stdout(ref stdout) => Result::Ok(Box::new(stdout.lock())),
+            Output::File(ref path) => Result::Ok(Box::new(File::create(path)?)),
         }
     }
 }
-
-macro_rules! stderr(
-    ($($arg:tt)*) => { {
-        let r = writeln!(&mut ::std::io::stderr(), $($arg)*);
-        r.expect("failed printing to stderr");
-    } }
-);
 
 /// Types implementing the `OrExit` provide the `or_exit` function that can
 /// be used to exit a program when a computation was not successful.
@@ -133,7 +126,7 @@ where
         match self {
             Result::Ok(val) => val,
             Result::Err(err) => {
-                stderr!("{}: {}", description.as_ref(), err);
+                eprintln!("{}: {}", description.as_ref(), err);
                 process::exit(code);
             }
         }
@@ -148,7 +141,7 @@ where
         match self {
             Some(val) => val,
             None => {
-                stderr!("{}", description.as_ref());
+                eprintln!("{}", description.as_ref());
                 process::exit(code);
             }
         }
